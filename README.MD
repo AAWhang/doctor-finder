@@ -13,7 +13,7 @@ _This web page is created for the sixth Friday project assigned to the students 
 * _clone repository off of Github_
 * _go to parent directory using terminal for Mac, git.bash for Windows_
 * _type in 'npm install' to install the proper webpacks_
-* _create your own .env file, type "API_KEY =" and insert your own api key_
+* _create your own .env file, type "exports.apiKey = "<insert your api key here"_
 * _type in 'npm start' to run the web page_
 
 
