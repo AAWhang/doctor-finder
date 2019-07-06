@@ -1,110 +1,38 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
+import FindDoctor from "./doctorObj.js";
 import $ from 'jquery';
 var api_key = process.env.exports.apiKey;
-// var resource_url = 'https://api.betterdoctor.com/2016-03-01/doctors?query=${ailment}&location=37.773,-122.413,100&skip=2&limit=10&user_key=' + api_key;
-
-function doctorFinder() {
-  return new Promise(function(resolve, reject) {
-    let request = new XMLHttpRequest();
-    let ailment = $("#querySearch").val();
-    let url = `https://api.betterdoctor.com/2016-03-01/doctors?query=${ailment}&location=37.773,-122.413,100&skip=2&limit=10&user_key=` + api_key;
-    request.onload = function() {
-      if (this.status === 200) {
-        resolve(request.response);
-      } else {
-        reject(Error(request.statusText));
-      }
-    };
-
-    request.open("GET", url, true);
-    request.send();
-  });
-}
-
-function insultMaker() {
-  return new Promise(function(resolve, reject) {
-    let request = new XMLHttpRequest();
-    let url = `https://evilinsult.com/generate_insult.php?lang=en&type=plain`;
-
-    request.onload = function() {
-      if (this.status === 200) {
-        resolve(request.response);
-      } else {
-        reject(Error(request.statusText));
-      }
-    };
-
-    request.open("GET", url, true);
-    request.send();
-    });
-}
-
-function bitTracker() {
-  return new Promise(function(resolve, reject) {
-    let request = new XMLHttpRequest();
-    let url = `https://api.coingecko.com/api/v3/coins/bitcoin`;
-
-    request.onload = function() {
-      if (this.status === 200) {
-        resolve(request.response);
-      } else {
-        reject(Error(request.statusText));
-      }
-    };
-
-    request.open("GET", url, true);
-    request.send();
-  });
-}
-
-function kanyeQuote() {
-  return new Promise(function(resolve, reject) {
-    let request = new XMLHttpRequest();
-    let url = `https://api.kanye.rest`;
-
-    request.onload = function() {
-      if (this.status === 200) {
-        resolve(request.response);
-      } else {
-        reject(Error(request.statusText));
-      }
-    };
-
-    request.open("GET", url, true);
-    request.send();
-  });
-}
 
 $(function(){
 
   $("#ailSubmit").click(function() {
+        event.preventDefault();
+    let search = $("#querySearch").val();
+    let findDoctor = new FindDoctor();
+    let promise = findDoctor.doctorFinder(search, api_key);
+    promise.then(function(response) {
+      let body = JSON.parse(response);
+      let catty = body["data"];
+      $('#doctors').html(``);
+      for (let i=0; i < catty.length; i++) {
+        $('#doctors').append(`<h1>Name: ${catty[i].profile.first_name} ${catty[i].profile.last_name}</h1>`);
+        $('#doctors').append(`<li>Address: ${catty[i].practices[0].visit_address.street} ${catty[i].practices[0].visit_address.city}, ${catty[i].practices[0].visit_address.state} ${catty[i].practices[0].visit_address.zip}</li>`);
+        $('#doctors').append(`<li>Phone: ${catty[i].practices[0].phones[0].number}`);
+        if (catty[i].practices[0].website != undefined) {
+          $('#doctors').append(`<li>Website: ${catty[i].practices[0].website}`);
+        }
+        if (catty[i].practices[0].accepts_new_patients === true) {
+          $('#doctors').append(`<li>Accepting new patients!</li>`);
+        } else {
+          $('#doctors').append(`<li>Not accepting new patients!</li>`);
+        }
+          $('#doctors').append(`<hr>`);
+      }
+    });
 
-  doctorFinder()
-        .then(function(response) {
-            let body = JSON.parse(response);
-            let catty = body.meta.total;
-            alert(catty);
-            $('#insult').html(`${catty}`);
-            return insultMaker();
-          })
-        .then(function(response) {
-          let insult = response;
-          $('#insult').append(`${insult}`);
-          return bitTracker();
-        })
-        .then(function(response) {
-          let coinVal = JSON.parse(response);
-          $('#coins').html(`1 btc = $${coinVal.market_data.current_price.usd} USD`);
-          return kanyeQuote();
-        })
-        .then(function(response) {
-          let kanye = JSON.parse(response);
-          $('#kanye').html(`Kanye says: "${kanye.quote}"`);
-        });
 
-    event.preventDefault();
 
   });
 });

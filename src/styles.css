@@ -2,7 +2,6 @@
   display: none;
 }
 
-
 body {
   text-align: center;
   margin-top:2%;
@@ -15,13 +14,5 @@ img {
   width:500px;
 }
 .card {
-  font-size:40px;
-}
-
-.linebottom {
-  border-bottom: 3px solid black;
-}
-
-.borderright {
-  border-right: 3px solid black;
+  font-size:25px;
 }
